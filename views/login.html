@@ -1,5 +1,36 @@
 {% include "header.html" %}
         <link rel="stylesheet" href="/css/login_box.css" />
-        <div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="pr-wrap">
+                        <div class="pass-reset">
+                            <label>Enter the email you signed up with</label>
+                            <input type="email" name="email" placeholder="Email" />
+                            <input type="submit" value="Submit" class="pass-reset-submit btn btn-success btn-sm" />
+                        </div>
+                    </div>
+                    <p class="form-title">Sign In</p>
+                    <form class="login">
+                        <input type="text" name="email" placeholder="E-mail" />
+                        <input type="password" name="pwd" placeholder="Password" />
+                        <input type="submit" value="Submit" class="pass-reset-submit btn btn-success btn-sm" />
+                        <div class="remember-forget">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="remember" /> Remember Me
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="javascript:void(0)" class="forgot-pass">Forgot Password</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 {% include "footer.html" %}

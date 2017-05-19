@@ -4,7 +4,11 @@ var config = require('../config');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: config.site.title });
+    if (typeof req.user !== 'undefined') {
+        res.render('feed', { title: config.site.title });
+    } else {
+        res.render('login', { title: config.site.title });
+    }
 });
 
 router.get('/auth/facebook', (req, res, next)=> {
