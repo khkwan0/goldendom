@@ -12,9 +12,13 @@
     "debug": "~2.6.3",
     "express": "~4.15.2",
     "express-session": "^1.15.3",
+    "moment": "^2.18.1",
     "mongodb": "^2.2.26",
     "monk": "^4.0.0",
     "morgan": "~1.8.1",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
+    "sendmail": "^1.1.1",
     "serve-favicon": "~2.4.2"
   }
 }
