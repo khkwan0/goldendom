@@ -4,33 +4,16 @@ var config = require('../config');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    if (typeof req.user !== 'undefined') {
-        res.render('feed', { title: config.site.title });
+    if (typeof req.session.key !== 'undefined') {
+        res.render('feed', { title: config.site.title, username: req.session.user.uname });
     } else {
         res.render('login', { title: config.site.title });
     }
 });
 
-router.get('/auth/facebook', (req, res, next)=> {
-    let passport = req.passport;
-    passport.authenticate('facebook', {scope: 'email'});
+router.get('/register', (req, res, next) => {
+    res.render('register', { title: config.site.title });
 });
 
-router.get('/auth/facebook/callback', (req, res, next) => {
-    let passport = req.passport;
-    passport.authenticate('facebook', {
-        successRedirect: '/',
-        failureRedirect: '/login'
-    });
-});
-
-router.post('/auth/local', (req, res, next) => {
-    let passport = req.passport;
-    passport.authenticate('local-login', {
-        successRedirect: '/status',
-        failureRedirect: '/login',
-        failureFlash: true
-    });
-});
 
 module.exports = router;

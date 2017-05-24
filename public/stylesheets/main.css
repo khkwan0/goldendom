@@ -1,3 +1,43 @@
 body {
-    background-color:#fcbcbb;
+/*    background-color:#fcbcbb; */
+    background-color:rgb(253, 189, 217);
+	background: -webkit-linear-gradient(left,rgba(253,189,217,0.3),rgba(253,189,217,0.9)); /*Safari 5.1-6*/
+	background: -o-linear-gradient(right,rgba(253,189,217,0.3),rgba(253,189,217,0.9)); /*Opera 11.1-12*/
+	background: -moz-linear-gradient(right,rgba(253,189,217,0.3),rgba(253,189,217,0.9)); /*Fx 3.6-15*/
+	background: linear-gradient(to right, rgba(253,189,217,0.3), rgba(253,189,217,0.9)); /*Standard*/
+    padding-top: 70px;
+}
+
+@font-face{ 
+    font-family: 'peach-sundress';
+/*    src: url('/fonts/peach-sundress.ttf'); */
+    src: url('/fonts/peach-sundress.ttf') format('truetype');
+}
+
+.fancy_username {
+    text-align:right;
+    font-family: 'peach-sundress', Arial, sans-serif;
+    font-size:3em;
+}
+
+.basic_username {
+    text-align:right;
+}
+
+.image_box {
+    margin-top: 5px;
+}
+
+.inner_img {
+    border-radius: 25px;
+}
+
+#uprofile_img_th {
+    padding: 5px 5px 5px 5px;
+    border-radius:25px;
+    background-color: white;
+}
+
+.button_box {
+padding: 10px 10px 10px 10px;
 }

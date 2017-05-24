@@ -1,0 +1,63 @@
+{% include "header.html" %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="register_box">
+                    <div>
+                        <input type="text" name="uname" id="uname" placeholder="User name" />
+                    </div>
+                    <div>
+                        <input type="password" name="pw1" id="pw1" placeholder="Password" />
+                    </div>
+                    <div>
+                        <input type="password" name="pw2" id="pw2" placeholder="Confirm password" />
+                    </div>
+                    <div>
+                        <button id="submit" class="btn btn-default">Submit</button>
+                    </div>
+                    <div id="error" style="display:none">
+                        <span id="err_msg"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/jquery.js"></script>
+    <script>
+        $('#submit').click((event) => {
+            $('#error').hide();
+            let uname = $('#uname').val();
+            let pw1 = $('#pw1').val();
+            let pw2 = $('#pw2').val();
+            let err_msg = '';
+            if (uname) {
+                if (pw1) {
+                    if (pw2) {
+                        if (pw1 == pw2) {
+                            $.post('/api/register',
+                                {
+                                    'uname': uname,
+                                    'pwd': pw1
+                                },
+                                (data) => {
+                                    console.log(data);
+                                }
+                            )
+                        } else {
+                            err_msg = 'Passwords do not match';
+                        }
+                    } else {
+                        err_msg = 'No confirmation';
+                    }
+                } else {
+                    err_msg = 'No password';
+                }
+            } else {
+                err_msg = 'No username';
+            }
+            $('#err_msg').text(err_msg);
+            $('#error').show();
+        });
+    </script>
+
+{% include "footer.html" %}
