@@ -1,53 +1,634 @@
 {% include "header.html" %}
+        <script src="/js/register.js"></script>
+        <script src="/js/identity.js"></script>
+        <script src="/js/aws-sdk.min.js"></script>
         <link rel="stylesheet" href="/css/login_box.css" />
-        <div class="container-fluid">
+        <style>
+            .other_user:hover {
+                cursor:pointer;cursor:hand;
+            }
+        </style>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="bs-example-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Goldendom</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li id="home_link_box" style="display:none"><a href="#" id="home_link">Home</a></li>
+                        <li id="logout_box" style="display:none"><a href="#" id="logout_link">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container-fluid" id="login_box" style="display:none">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="pr-wrap">
-                        <div class="pass-reset">
-                            <label>Enter the username you signed up with</label>
-                            <input type="text" name="uname" placeholder="Username" />
-                            <input type="submit" value="Submit" class="pass-reset-submit btn btn-success btn-sm" />
+                    <div id="outer_login_box">
+                        <div class="pr-wrap">
+                            <div class="pass-reset">
+                                <label>Enter the username you signed up with</label>
+                                <input type="text" name="uname" placeholder="Username" />
+                                <input type="submit" value="Submit" class="pass-reset-submit btn btn-success btn-sm" />
+                            </div>
                         </div>
-                    </div>
-                    <p class="form-title">Sign In</p>
-                    <div class="login">
-                        <input type="text" id="uname" name="uname" placeholder="Username" />
-                        <input type="password" id="pwd" name="pwd" placeholder="Password" />
-                        <button id="submit" class="pass-reset-submit btn btn-success btn-sm">Submit</button>
-                        <div class="remember-forget">
+                        <p class="form-title">Sign In</p>
+                        <div class="login">
+                            <input type="text" id="uname" name="uname" placeholder="Username" />
+                            <input type="password" id="pwd" name="pwd" placeholder="Password" />
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" name="remember" /> Remember Me
-                                        </label>
+                                    <button id="submit" class="pass-reset-submit btn btn-success btn-sm">Submit</button>
+                                </div>
+                                <div class="col-md=6">
+                                    <button id="start_reg" class="pass-reset-submit btn btn-success btn-sm">Register</button>
+                                </div>
+                            </div>
+                            <div class="remember-forget">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="remember" /> Remember Me
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="javascript:void(0)" class="forgot-pass">Forgot Password</a>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <a href="javascript:void(0)" class="forgot-pass">Forgot Password</a>
-                                </div>
+                            </div>
+                            <div id="invalid_login" style="display:none">
+                                Invalid username or password
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="container-fluid" id="reg_box_outer" style="display:none">
+            <div class="row">
+                <p class="form-title">Register</p>
+                                <div class="login" id="register_box">
+                                    <div id="reg_box_inner">
+                                        <div>
+                                            <input type="text" id="reg_uname" name="reg_uname" placeholder="Desired Username"/>
+                                            <input type="text" id="reg_email" name="reg_email" placeholder="Email" />
+                                            <input type="password" id="reg_pwd" name="reg_pwd" placeholder="Password" />
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-success btn-sm" id="reg_submit">Register</button>
+                                        </div>
+                                    </div>
+                                    <div id="reg_verify_box" style="display:none">
+                                        <p>
+                                            You should have received a verification code by email <span id="regged_email"></span>.  Please find code and verify here.
+                                        </p>
+                                        <label>Verification Code</label>
+                                        <input type="text" id="reg_code" name="reg_code" placeholder="Verification Code"/>
+                                        <button class="btn btn-success btn-sm" id="reg_verify">Verify</button>
+                                    </div>
+                                </div>
+            </div>
+        </div>
+        <div class="container-fluid" id="feed_box" style="display:none">
+            <div class="row">
+                <div class="col-md-4 col-sm-4">
+                    <div id="user_profile">
+                        <div id="user_profile_image" style="height=200px;width=200px">
+                        </div>
+                        <div id="user_profile_metadata">
+                            <div id="user_profile_name">
+                                <span id="user_name">
+                                </span>
+                            </div>
+                            <div id="user_profile_email">
+                                <span id="email">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="postbox">
+                        <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput">
+                        <button id="umedia" class="btn btn-large btn-block">Post media</button>
+                        Caption: <textarea rows="2" id="caption_input"></textarea>
+                    </div>
+                    <div><h3>My posts</h3></div>
+                    <div id="my_activity">
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4">
+                    <h2>News Feed</h2>
+                    <div id="news_feed">
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4">
+                    <h3>Others</h3>
+                    <div class="other_users">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid" id="other_feed_box" style="display:none">
+            <div class="row">
+                <div class="col-md-4 col-sm-4"></div>
+                <div class="col-md-4 col-sm-4">
+                    <div id="other_profile">
+                        <div id="other_profile_image" style="height:200px;width:200px">
+                        </div>
+                        <div id="other_profile_metadata">
+                            <span id="other_user_name"></span>
+                        </div>
+                        <div id="other_user_profile_email">
+                            <span id="other_email"></span>
+                        </div>
+                        <div id="follow_other">
+                            <span id="follow_other_span"></span>
+                        </div>
+                        <div id="other_feed">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4">
+                    <h3>Others</h3>
+                    <div class="other_users">
+                    </div>
+                </div>
+            </div>
+        </div>
         <script src="/js/jquery.js"></script>
         <script>
-            $('#submit').click((event) => {
+            var poolData = {
+                UserPoolId: 'us-east-1_MiC8e6nnS',
+                ClientId: '37q5666pongdfafupjr15hbt9t',
+            };
+            var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+            var cognitoUser = userPool.getCurrentUser();
+            var session = null;
+            var IdentityPoolId = 'us-east-1:0c7f33c1-9ea6-4265-be86-a497f9fd5ba7';
+            var savedUname = '';
+
+            if (cognitoUser != null) {
+                postLogin();
+            } else {
+                $('#login_box').show();
+            }
+
+            function postLogin() {
+                cognitoUser.getSession(function(err, rsession) {
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+                    session = rsession;
+                    console.log('session validity: ' + session.isValid());
+                    console.log('access token ----' + session.getAccessToken().getJwtToken());
+                    console.log('idToken ----' + session.idToken.jwtToken);
+                    $('#logout_box').show();
+                    $('#home_link_box').show();
+                    $('#login_box').hide();
+                    $('#feed_box').show();
+                    $('#other_feed_box').hide();
+                    getProfile(session);
+                });
+            }
+
+            function getProfile(session) {
+                if (cognitoUser != null) {
+                    if (localStorage.getItem('name')) {
+                        console.log('retrieve from local');
+                        showProfilePic();
+                        showProfileShort();
+                        getFeed(session);
+                        getUserFeed(session, localStorage.getItem('sub'));
+                        getUsers();
+                    } else {
+                        cognitoUser.getUserAttributes(function (err, result) {
+                            if (err) {
+                                console.log(err);
+                                return err;
+                            }
+                            $.each(result,(function(key, value) {
+                                localStorage.setItem(value.Name, value.Value);
+                            }));
+                            localStorage.setItem('profile_pic', getProfilePic(session));
+                            showProfilePic();
+                            showProfileShort();
+                            getFeed(session);
+                            getUserFeed(session, localStore.getItem('sub'));
+                            getUsers();
+                        });
+                    }
+                } 
+            }
+
+            function getUsers() {
+                $.ajax('https://tfi45rxph1.execute-api.us-east-1.amazonaws.com/dev/getusers', {
+                    headers: {
+                        "Authorization": session.idToken.jwtToken
+                    },
+                    success: function(data, status) {
+                        console.log(data);
+                        showUsers(data);
+                    }
+                });
+            }
+
+            function showUsers(data) {
+                html = '';
+                $.each(data, function(key, value) {
+                    if (value.sub != localStorage.getItem('sub')) {
+                        html += '<div><span class="other_user" email="'+value.email+'" name="'+value.name+'" sub="'+value.sub+'">'+value.name+'</span></div>';
+                    }
+                });
+                $('.other_users').html(html);
+            }
+
+            function showFeed(newsFeed) {
+                console.log(typeof newsFeed);
+                let html = '';
+                if (newsFeed && typeof newsFeed.errorMessage === 'undefined') {
+                    $.each(newsFeed, function(key, value) {
+                        html += '<div>';
+                        html += '<div>';
+                        html += '<pre>';
+                        html += JSON.stringify(value,null,4);
+                        html += '</pre>';
+                        html += '</div>';
+                        html += '<div>';
+                        try {
+                            html += '<button postid="'+value._id+'" class="likepost">Like</button>';
+                        } catch(e) {
+                            console.log(e);
+                        }
+                        html += '</div>'
+                        html += '<div>';
+                        try {
+                            html += '<textarea rows="2" id="comment'+value._id+'" postid="'+value._id+'" class="commentpost"></textarea><button class="savecomment" postid="'+value._id+'">Save Comment</button>';
+                        } catch(e) {
+                            console.log(e);
+                        }
+                        html += '</div>';
+                        html += '</div>';
+                    });
+                    $('#news_feed').html(html);
+                }
+            }
+
+            $(document).on('click', '.other_user', function(event) {
+                let subid = $(this).attr('sub');
+                if (subid != localStorage.getItem('sub')) {
+                    let name = $(this).attr('name');
+                    let email = $(this).attr('email');
+                    getOtherFeed(subid, email, name);
+                }
+            });
+
+            $(document).on('click', '.likepost', function(event) {
+                let postid = $(this).attr('postid');
+                likePost(postid);
+            });
+
+            $(document).on('click','.savecomment', function(event) {
+                let postid = $(this).attr('postid');
+                let comment = $('#comment'+postid).val();
+                console.log(postid + ' ' + comment);
+                if (comment) {
+                    saveComment(postid, comment);
+                } 
+            });
+
+            function showActivity(activity) {
+                let html = '';
+                $.each(activity, function(key, value) {
+                    html += '<div>';
+                    html += '<pre>';
+                    html += JSON.stringify(value,null,4);
+                    html += '</pre>';
+                    html += '</div>';
+                });
+                $('#my_activity').html(html);
+            }
+
+            function showOtherFeed(data, email, name, sub) {
+                $('#feed_box').hide();
+                $('#other_feed_box').show();
+                $('#other_user_name').text(name);
+                $('#other_email').text(email);
+                $('#other_profile_image').html('<img src="'+getOtherProfilePic(sub)+'" />');
+                $('#follow_other_span').html('<button id="other_follow_button" subid="'+sub+'">Follow</button>');
+                html = '';
+                $.each(data, function(key, value) {
+                    html += '<div>';
+                    html += '<pre>';
+                    html += value;
+                    html += '</pre>';
+                    html += '</div>';
+                    html += '<div>';
+                    try {
+                        html += '<button postid="'+value._id+'" class="likepost">Like</button>';
+                    } catch(e) {
+                        console.log(e);
+                    }
+                    html += '</div>'
+                    html += '<div>';
+                    try {
+                        html += '<textarea rows="2" id="comment'+value._id+'" postid="'+value._id+'" class="commentpost"></textarea><button class="savecomment" postid="'+value._id+'">Save Comment</button>';
+                    } catch(e) {
+                        console.log(e);
+                    }
+                    html += '</div>';
+                    html += '</div>';
+                });
+                $('#other_feed').html(html);
+
+            }
+
+            function saveComment(postId, comment) {
+                data = {
+                    postid: postId,
+                    comment: comment,
+                    sub: localStorage.getItem('sub')
+                };
+                $.ajax({
+                    url:'https://tfi45rxph1.execute-api.us-east-1.amazonaws.com/dev/comment',
+                    type: 'post',
+                    data: JSON.stringify(data),
+                    headers: {
+                        "Authorization": session.idToken.jwtToken,
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    success: function(data, status) {
+                        console.log(data);
+                    }
+
+                });
+            }
+
+            function likePost(postId) {
+                data = {
+                    postid: postId,
+                    like: 1,
+                    sub: localStorage.getItem('sub')
+                };
+                $.ajax({
+                    url:'https://tfi45rxph1.execute-api.us-east-1.amazonaws.com/dev/like',
+                    type: 'put',
+                    data: JSON.stringify(data),
+                    headers: {
+                        "Authorization": session.idToken.jwtToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    success: function(data, status) {
+                        console.log(data);
+                    }
+                });
+            }
+
+            function getUserFeed(session, sub) {
+                $.ajax('https://tfi45rxph1.execute-api.us-east-1.amazonaws.com/dev/getuserfeed?sub='+sub, {
+                    headers: {
+                        "Authorization": session.idToken.jwtToken
+                    },
+                    success: function(data, status) {
+                        console.log(data);
+                        showActivity(data);
+                    }
+                });
+            }
+
+            function getOtherFeed(sub, email, name) {
+                $.ajax('https://tfi45rxph1.execute-api.us-east-1.amazonaws.com/dev/getuserfeed?sub='+sub, {
+                    headers: {
+                        "Authorization": session.idToken.jwtToken
+                    },
+                    success: function(data, status) {
+                        showOtherFeed(data, email, name, sub);
+                    }
+                });
+            }
+
+            function getFeed(session) {
+                console.log('get feed: '+session.idToken.jwtToken);
+                $.ajax('https://tfi45rxph1.execute-api.us-east-1.amazonaws.com/dev/getFeed?sub='+localStorage.getItem('sub'), {
+                    headers: {
+                        "Authorization": session.idToken.jwtToken
+                    },
+                    success: function(data, status) {
+                        console.log(data);
+                        showFeed(data);
+                    }
+                });
+            }
+
+            function showProfileShort() {
+                $('#user_name').text(localStorage.getItem('name'));
+                $('#email').text(localStorage.getItem('email'));
+
+            }
+            function showProfilePic() {
+                $('#user_profile_image').html('<img src="'+localStorage.getItem('profile_pic')+'" />');
+            }
+
+            function getProfilePic(session) {
+                return 'http://23.239.1.81:3501/cdn/img/default.png';
+            }
+
+            function getOtherProfilePic(sub) {
+                return 'http://23.239.1.81:3501/cdn/img/default.png';
+            }
+
+
+            $('#logout_link').click(function(event) {
+                if (cognitoUser != null) {
+                    cognitoUser.signOut();
+                }
+                $('#login_box').show();
+                $('#feed_box').hide();
+                $('#logout_box').hide();
+                $('#home_link_box').hide();
+                $('#other_feed_box').hide();
+            });
+
+            $('#home_link').click(function(event) {
+                $('#other_feed_box').hide();
+                $('#feed_box').show();
+            });
+
+            $('#umedia').click(function(ev) {
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: IdentityPoolId,
+                    Logins: {
+                        'cognito-idp.us-east-1.amazonaws.com/us-east-1_MiC8e6nnS': session.idToken.getJwtToken()
+                    }
+                });
+                AWS.config.update({
+                    region: 'us-east-1',
+                    IdentityPoolId: IdentityPoolId
+                });
+                let caption = '';
+                caption = $('#caption_input').val();
+
+                let customData = {
+                    'caption': caption,
+                    'sub': localStorage.getItem('sub')
+                }
+                var s3 = new AWS.S3({
+                    apiVersion: '2012-10-17',
+                    endpoints: 'https://s3.amazonaws.com',
+                    params: {
+                        Bucket: 'cdn2.goldendom.com'
+                    }
+                });
+                var file = $('#cameraInput')[0].files[0];
+                var photoKey = 'users/'+localStorage.getItem('sub')+'/'+ file.name;
+                var params = {
+                    Key: photoKey,
+                    ContentType: file.type,
+                    Body: file,
+                    Metadata: customData    
+                };
+                s3.upload(params).on('httpUploadProgress', function(evt) {
+                    console.log('Uploaded: ' + parseInt((evt.loaded * 100) / evt.total) + '%');
+                }).send(function(err, data) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log('File uploaded');
+                        $('#caption_input').val('');
+                        $('#cameraInput').val('');
+                    }
+                });
+            });
+
+            $('#submit').click(function(event) {
                 let uname = $('#uname').val();
                 let pwd = $('#pwd').val();
                 if (uname && pwd) {
-                    $.post('/api/login',
-                        {
-                            'uname': uname,
-                            'pwd': pwd
-                        },
-                        (data) => {
-                        }
-                    );
+                    $('#invalid_login').hide();
+                    var authenticationData = {
+                        Username: uname,
+                        Password: pwd
+                    };
+                    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+					var userData = {
+						Username : uname,
+						Pool : userPool
+					};
+					cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+
+					cognitoUser.authenticateUser(authenticationDetails, {
+						onSuccess: function(result) {
+                            $('#logout_box').show();
+                            $('#login_box').hide();
+                            cognitoUser.getUserAttributes(function (err, result2) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    $.each(result2, function(key, value) {
+                                        localStorage.setItem(value.Name, value.Value);
+                                    });
+                                    localStorage.setItem('profile_pic', getProfilePic(session));
+                                    postLogin();
+                                }
+                            });
+						},
+						onFailure: function(err) {
+							console.log(err);
+                            $('#invalid_login').show();
+						}
+					});
                 }
+            });
+            $('#start_reg').click(function(event) {
+                $('#login_box').hide();
+                $('#reg_box_outer').show();
+            });
+
+            $(document).ready(function() {
+                setInterval(checkNotifications(), 60000);
+            });
+
+            function checkNotifications() {
+                let sub = localStorage.getItem('sub');
+                $.ajax('https://tfi45rxph1.execute-api.us-east-1.amazonaws.com/dev/checknotifications?sub='+sub, {
+                    headers: {
+                        "Authorization": session.idToken.jwtToken
+                    },
+                    success: function(data, status) {
+                        updateNotifications(data);
+                    }
+                });
+            };
+
+            function updateNotifications(data) {
+                console.log('notifications :'+data);
+            }
+
+            $('#reg_submit').click(function(event) {
+                var uname = $('#reg_uname').val();
+                var email = $('#reg_email').val();
+                var pwd = $('#reg_pwd').val();
+
+                if (uname && email && pwd) {
+                    var attributeList = [];
+                    var dataEmail = {
+                        Name: 'email',
+                        Value: email
+                    }
+
+                    var dataUname = {
+                        Name: 'name',
+                        Value: uname
+                    }
+
+                    var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
+                    var attributeUname = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataUname);
+
+                    attributeList.push(dataEmail);
+                    attributeList.push(dataUname);
+
+                    console.log('signing up');
+                    userPool.signUp(uname, pwd, attributeList, null,  function(err, result) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        cognitoUser = result.user;
+                        savedUname = cognitoUser.getUsername();
+                        $('#reg_box_inner').hide();
+                        $('#regged_email').text(email);
+                        $('#reg_verify_box').show();
+                        console.log('registered, but not verified');
+                    });
+                }
+            });
+
+            $('#reg_verify').click(function(event) {
+                var code = $('#reg_code').val();
+                var userData = {
+                    Username: savedUname,
+                    Pool: userPool
+                };
+                var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+                console.log(code);
+                console.log(cognitoUser);
+                cognitoUser.confirmRegistration(code, true, function(err, result) {
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+                    console.log('verify result: '+ result);
+                    postLogin();
+                });
             });
         </script>
 {% include "footer.html" %}

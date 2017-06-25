@@ -1,0 +1,1 @@
+aws/aws-cognito-sdk.min.js

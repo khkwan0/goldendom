@@ -1,0 +1,86 @@
+{% include "header.html" %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="button_box">
+            <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput">
+            <button id="umedia" class="btn btn-large btn-block">Post media</button>
+        </div>
+    </div>
+</div>
+<script>
+    $('#umedia').click(function(event) {
+        var poolData = {
+            UserPoolId: 'us-east-1_MiC8e6nnS',
+            ClientId: '37q5666pongdfafupjr15hbt9t'
+        };
+
+        var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+		var cognitoUser = userPool.getCurrentUser();
+
+                    console.log(cognitoUser);
+		if (cognitoUser != null) {
+			cognitoUser.getSession(function(err, result) {
+				if (result) {
+					console.log('You are logged in.');
+
+					// Add the User's Id Token to the Cognito credentials login map.
+					AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                        IdentityPoolId: 'us-east-1:0c7f33c1-9ea6-4265-be86-a497f9fd5ba7',
+						Logins: {
+							'cognito-idp.us-east-1.amazonaws.com/us-east-1_MiC8e6nnS': result.getIdToken().getJwtToken()
+						}
+					});
+                    console.log('a');
+                    console.log(AWS.config.credentials);
+                    AWS.config.update({
+                        region: 'us-east-1',
+                        IdentityPoolId: 'us-east-1:0c7f33c1-9ea6-4265-be86-a497f9fd5ba7'
+                    });
+                    console.log('b');
+                    console.log(AWS.config.credentials);
+                    cognitoUser.getUserAttributes(function(err, result) {
+                        if (err) {
+                            console.log(err);
+                        } else { 
+                            console.log(result[0].Value);
+                            let userSub = result[0].Value;
+                            var s3 = new AWS.S3({
+                                apiVersion: '2012-10-17',
+                                endpoint: 'https://s3.amazonaws.com',
+                                params: {Bucket: 'cdn2.goldendom.com'}
+                            });
+
+                            var file = $('#cameraInput')[0].files[0];
+                            var photoKey = 'users/'+userSub+'/'+ file.name;
+                            var params = {
+                                Key: photoKey,
+                                ContentType: file.type,
+                                Body: file
+                            };
+                            s3.upload(params).on('httpUploadProgress', function(evt) {
+                                console.log('Uploaded: ' + parseInt((evt.loaded * 100) / evt.total) + '%');
+                            }).send(function(err, data) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.log('File uploaded');
+                                    console.log(data);
+                                }
+                            });
+                        }
+                    });
+				}
+			});
+		}
+        /*
+		AWS.config.update({
+			region: 'us-west-2',
+			credentials: new AWS.CognitoIdentityCredentials({
+				IdentityPoolId: 'us-west-2:1067340a-86ca-4344-8f7b-07c1787b4523'
+			})
+		});
+
+        */
+    });
+</script>
+{% include "footer.html" %}

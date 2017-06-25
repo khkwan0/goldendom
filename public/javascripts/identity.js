@@ -1,0 +1,1 @@
+aws/amazon-cognito-identity.min.js

@@ -1,0 +1,27 @@
+{% include "header.html" %}
+    <div>
+    </div>
+    <script>
+	var data = {
+		UserPoolId : 'us-east-1_MiC8e6nnS',
+		ClientId : '37q5666pongdfafupjr15hbt9t'
+	};
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(data);
+    var cognitoUser = userPool.getCurrentUser();
+    console.log(cognitoUser);
+
+    if (cognitoUser != null) {
+        cognitoUser.signOut();
+        cognitoUser.globalSignOut();
+        /*
+        cognitoUser.getSession(function(err, session) {
+            if (err) {
+                alert(err);
+                return;
+            }
+            console.log('session validity: ' + session.isValid());
+        });
+        */
+    } 
+    </script>
+{% include "footer.html" %}

@@ -1,0 +1,107 @@
+{% include "header.html" %}
+    <div class="container-fluid">
+        <script src="/js/register.js"></script>
+        Uname
+        <input type="text" id="uname" name="uname" />
+        Email
+        <input type="text" id="email" name="email" />
+        Password
+        <input type="password" id="pwd" name="pwd" />
+        <button id="submit">Register</button>
+    </div>
+    <div>
+        Verify
+        <input type="text" id="code" name="code" />
+        <button id="verify">Verify</button>
+    </div>
+    <div>
+        Reset
+        Code: <input id="reset_code" />
+        New password <input id="new_pwd" type="password" />
+        <button id="reset">Reset</button>
+    </div>
+    <script src="/js/register.js"></script>
+    <script src="/js/identity.js"></script>
+    <script>
+        var poolData = {
+            UserPoolId: 'us-east-1_MiC8e6nnS',
+            ClientId: '37q5666pongdfafupjr15hbt9t'
+        };
+        var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+        var savedUname = '';
+
+        $('#reset').click(function(event) {
+             code = $('#reset_code').val();
+             new_pwd = $('#new_pwd').val();
+             
+            var userData = {
+                Username: $('#uname').val(),
+                Pool: userPool
+            };
+            var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+
+            cognitoUser.forgotPassword({
+                onSuccess: function(result) {
+                    consoler.log(result);
+                },
+                onFailure: function(err) {
+                    alert(err);
+                },
+                inputVerificationCode() {
+                    cognitoUser.confirmPassword(code, new_pwd, this);
+                }
+            });
+        });
+
+        $('#verify').click(function(event) {
+            var code = $('#code').val();
+            var userData = {
+                Username: $('#uname').val(),
+                Pool: userPool
+            };
+            var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+            console.log(code);
+            console.log(cognitoUser);
+            cognitoUser.confirmRegistration(code, true, function(err, result) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log('verify result: '+ result);
+            });
+        });
+
+        $('#submit').click(function(event) {
+            var uname = $('#uname').val();
+            var email = $('#email').val();
+            var pwd = $('#pwd').val();
+
+            var attributeList = [];
+            var dataEmail = {
+                Name: 'email',
+                Value: email
+            }
+
+            var dataUname = {
+                Name: 'name',
+                Value: uname
+            }
+
+            var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
+            var attributeUname = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataUname);
+
+            attributeList.push(dataEmail);
+            attributeList.push(dataUname);
+
+            userPool.signUp(uname, pwd, attributeList, null,  function(err, result) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                cognitoUser = result.user;
+                savedUname = cognitoUser.getUsername();
+
+            });
+        });
+    </script>
+{% include "footer.html" %}

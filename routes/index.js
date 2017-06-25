@@ -15,5 +15,20 @@ router.get('/register', (req, res, next) => {
     res.render('register', { title: config.site.title });
 });
 
+router.get('/register2', (req, res, next) => {
+    res.render('register2', { title: config.site.title });
+});
+
+router.get('/login', (req, res, next) => {
+    res.render('login', {title: config.site.title });
+});
+
+router.get('/post', (req, res, next) => {
+    res.render('post', {title: config.site.title });
+});
+
+router.get('/logout', (req, res, next) => {
+    res.render('logout', { title: config.site.title });
+});
 
 module.exports = router;
