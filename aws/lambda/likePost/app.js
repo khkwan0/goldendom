@@ -37,30 +37,71 @@ function likedislike(db, event, callback, context) {
     let like = event.like
     let postId = event.postid;
     let amt = 0;
-    let sub = event.sub;
+    let liker = event.sub;
     if (like == 1) {
         amt = 1;
     } else {
         amt = -1;
     }
-    getUser(db,sub).
-    then((author) => { console.log(author);db.collection('posts').updateOne({_id:new ObjectId(postId)}, { $inc: { likes: amt }, $addToSet: {likers: author}}, (err, result) => {
-            if (err) {
-                callback(err, context);
-            } else {
-                callback(null, result);
-            }
-        });
-    }).catch((err) => { callback(err, context) });
+    getLikerUserName(db,liker).
+    then((liker) => { return recordLike(db, liker, amt, postId); }).
+    then(() => { return getPostAuthor(db, postId); }).
+    then((author) => { ;return addNotification(db, author, liker, postId, callback); }).
+    then((result) => { callback(null, result); }).
+    catch((err) => { callback(err, context) });
 }
 
-function getUser(db, sub) {
+function getPostAuthor(db, postId) {
+    return new Promise((resolve, reject) => {
+        db.collection('posts').findOne({_id:new ObjectId(postId)}, { sub: 1 }, (err, result) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(result.sub);
+        });
+    });
+}
+
+function recordLike(db, liker, amt, postId) {
+    return new Promise((resolve, reject) => {
+        db.collection('posts').updateOne({_id:new ObjectId(postId)}, { $inc: { likes:amt }, $addToSet: {likers: liker}}, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(db);
+            }
+        });
+    });
+}
+
+function getLikerUserName(db, sub) {
     return new Promise((resolve, reject) => {
         db.collection('users').findOne({sub:sub}, { name:1 }, (err, result) => {
             if (err) {
                 reject(err);
             } else {
                 resolve(result.name);
+            }
+        });
+    });
+}
+
+function addNotification(db, author, sub, postId) {
+    return new Promise((resolve, reject) => {
+        let data = {
+            postid: postId,
+            unread: 1,
+            meta: {
+                who: sub,
+                ts: new Date(),
+                what: 'like'
+            }
+        };
+        db.collection('notifications').update({sub:author}, {$addToSet: {notifications: data}}, (err, result) => {
+            if (err) {
+                reject(err);
+            }  else {
+                resolve(result);
             }
         });
     });

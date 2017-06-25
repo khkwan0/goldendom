@@ -317,6 +317,7 @@
             }
 
             function showOtherFeed(data, email, name, sub) {
+                console.log(data);
                 $('#feed_box').hide();
                 $('#other_feed_box').show();
                 $('#other_user_name').text(name);
@@ -327,7 +328,7 @@
                 $.each(data, function(key, value) {
                     html += '<div>';
                     html += '<pre>';
-                    html += value;
+                    html += JSON.stringify(value, null, 4);
                     html += '</pre>';
                     html += '</div>';
                     html += '<div>';
@@ -554,7 +555,7 @@
             });
 
             $(document).ready(function() {
-                setInterval(checkNotifications(), 60000);
+                setInterval(checkNotifications, 300000);
             });
 
             function checkNotifications() {
